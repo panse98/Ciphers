@@ -32,7 +32,6 @@ def caesar(key):
 
 
 
-
 def hill(key):
     key=np.array(key)
     if key.shape==(2,2):
@@ -50,9 +49,10 @@ def hill(key):
     for line in plain:
         result=""
         #print(len(line))
-        if (len(line)) % np.shape(key)[0] > 0:
-          line= line + 'x'
+        while (len(line)) % np.shape(key)[0] > 0:
+          line= line + 'X'
           #print(len(line))
+          #print(line)
         line_vec=np.zeros((len(line),1))
          # convert letters to numbers
         for i in range(len(line)):
@@ -62,7 +62,8 @@ def hill(key):
         line_vec=np.reshape(line_vec,(-1,(np.shape(key)[0])))
         #print (line_vec)
         A=np.dot(key,line_vec.T)
-        #print(A)
+        A=np.mod(A,26)
+        A=A.T
         # convert numbers to letters
         
         A=np.reshape(A,(-1,1))
@@ -71,6 +72,7 @@ def hill(key):
             A[i]=A[i]
             #print(A[i])
             result+=chr((A[i]%26)+65)
+
         #print(result)
         if key.shape==(2,2):
              p= open("Output Files/hill_enc_2x2.txt", "a")
@@ -84,11 +86,29 @@ def hill(key):
             
         
 
+        
+
+      
+
+    
+
+
+
+
     #for debugginggg###
     #a=np.array([[2,2,3],[1,1,3]])
     #print(np.shape(a)[0])
     #print(np.shape(a)[1])
     #print(np.multiply([[1,1],[2,2]],[1,1]))
+        
+
+
+
+
+
+
+
+
 
 
 def generate_key_matrix(k):
@@ -141,7 +161,7 @@ def playfair(key):
         temp = line
 
         for i in range(len(temp) - 1):
-            if (temp[i] == temp[i + 1]):
+            if (temp[i] == temp[i + 1] and i%2==0):
                 text += temp[i] + "x"
             else:
                 text += temp[i]
@@ -190,34 +210,40 @@ def vernam(key):
             for line in plain:
                 result=""
                 for i in range(len(line)):
-                    result+= chr((ord(line[i])-65 ^ ord(key[i])-65) %26+65)
+                    result+= chr((((ord(line[i])-65) + (ord(key[i])-65)) %26)+65)
                 p.write(result)
                 p.write("\n")
             p.close()
-def vigenere(key,mode):
+                         
+               
+def vigenere(k,mode):
     
 
             f = open("Input Files/Vigenere/Vigenere_plain.txt", "r")
-            plain=f.read()
+            plain=f.read().lower()
             plain=plain.split("\n")
 
             #print(plain)
 
             p= open("Output Files/Vigenere_enc.txt", "a")
            
-            p.write("key="+key+"\n")
+            p.write("key="+k+"\n")
             
             
             for line in plain:
                 result=""
+                key=""
+
                 #print(line)
                 if mode==True: #auto
-                    key=key+line
+                    #for i in range(len(line)-len(key)):
+                     key=k+line
+                     #print(key)
                 else: # repeaating
                     #print(len(line))
                     #print(len(key))
                     for i in range(len(line)-len(key)):
-                        key=key+key[i]
+                        key=key+k
                 for i in range(len(line)):
                     result+=chr((ord(line[i])-97 + ord(key[i]) - 97) % 26 + 97)
                 p.write(result)
@@ -225,11 +251,6 @@ def vigenere(key,mode):
             p.close()
                     
             #print(result) 
-
-
-
-
-
 
     
 #return result 

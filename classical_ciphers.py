@@ -1,8 +1,28 @@
 import numpy as np
 
 
+def caesar(text,key):
+    result=""
+            
 
-def caesar(key):
+    for i in range(len(text)): 
+        char = text[i] 
+                
+        if (char.isupper()): 
+            char=char.lower()
+            result += chr((ord(char) + key - 97) % 26 + 97) 
+        
+                
+        else: 
+            result += chr((ord(char) + key - 97) % 26 + 97) 
+                #p= open("C:\\Users\hp\Desktop\caesar\caesar_enc.txt", "a")
+                #print(result)
+    return result
+                   
+
+
+
+def caesar_files(key):
 
             f = open("Input Files/Caesar/caesar_plain.txt", "r")
 #print(f.read())
@@ -33,9 +53,37 @@ def caesar(key):
             p.close()
 
 
+def hill(text,key):
+     key=np.array(key)
+     text=text.lower()
+     while (len(text)) % np.shape(key)[0] > 0:
+          text= text + 'X'
+     text_vec=np.zeros((len(text), 1))
+     result=""
+     for i in range(len(text)):
+            text_vec[i]=(ord(text[i])-97)     # because lowercase
+     text_vec=np.reshape(text_vec,(-1,(np.shape(key)[0])))
+     A=np.dot(key,text_vec.T)
+     A=np.mod(A,26)
+     A=A.T
+        # convert numbers to letters
+        
+     A=np.reshape(A,(-1,1))
+     for i in range( len(A)):
+        A[i]=A[i]
+            #print(A[i])
+        result+=chr((A[i]%26)+65)
+     return result
 
 
-def hill(key):
+
+
+
+    
+        
+
+
+def hill_files(key):
     key=np.array(key)
     if key.shape==(2,2):
         f = open("Input Files/Hill/hill_plain_2x2.txt", "r")
@@ -137,19 +185,53 @@ def generate_key_matrix(k):
 
 
 
-#def search (key_matrix,letter):
-#	x=y=0
-#	for i in range(5):
-#		for j in range(5):
-#			if key_matrix[i][j]==letter:
-#				x=i
-#				y=j
-
-#	return x,y
 
 
+def playfair(text,key):
+     text=text.lower()
+     
+     key.lower()
+     key = generate_key_matrix(key)
+     result = ""
+     text1= ""
+     temp = text
 
-def playfair(key):
+     for i in range(len(temp) - 1):
+            if (temp[i] == temp[i + 1] and i%2==0):
+                text1 += temp[i] + "x"
+            else:
+                text1 += temp[i]
+     text1 += temp[-1]
+
+     if (len(text1) % 2 != 0):
+            text1 += "x"
+
+     for i in range(0, len(text1), 2):
+            letter1 = ord(text1[i])
+            letter2 = ord(text1[i + 1])
+            if (letter1 == 106):
+                letter1 -= 1
+            if (letter2 == 106):
+                letter2 -= 1
+            p1,q1 = np.where(key == letter1)
+            p2,q2= np.where(key == letter2)
+            r1 = int(p1)
+            c1 = int(q1)
+            r2 = int(p2)
+            c2 = int(q2)
+            if (r1 == r2):
+                result+= chr(int(key[r1][(c1 + 1) % 5])) + chr(int(key[r2][(c2 + 1) % 5]))
+            elif (c1 == c2):
+                result += chr(int(key[(r1 + 1) % 5][c1])) + chr(int(key[(r2 + 1) % 5][c2]))
+            else:
+                result += chr(int(key[r1][c2])) + chr(int(key[r2][c1]))
+     return result
+
+
+
+
+
+def playfair_files(key):
     f = open("Input Files/PlayFair/playfair_plain.txt", "r")
     plain=f.read()
     plain=plain.split("\n")
@@ -196,8 +278,17 @@ def playfair(key):
         p.write(result)
         p.write('\n')
     p.close()
-        
-def vernam(key):
+
+
+
+def vernam(text,key):
+    result=""
+    for i in range(len(text)):
+        result+= chr((((ord(text[i])-65) + (ord(key[i])-65)) %26)+65)
+    return result
+
+
+def vernam_files(key):
     
 
             f = open("Input Files/Vernam/vernam_plain.txt", "r")
@@ -217,9 +308,34 @@ def vernam(key):
                 p.write(result)
                 p.write("\n")
             p.close()
+
+
+def vigenere(text,k,mode):
+    text=text.lower()
+    k=k.lower()
+    result=""
+    key=""
+
+                #print(line)
+    if mode=="1": #auto
+        print(mode)
+        for i in range(len(text)-len(key)):
+         key=k+text
+        print(key)
+                     #print(key)
+    else: # repeaating
+                    #print(len(line))
+                    #print(len(key))
+        for i in range(len(text)-len(key)):
+            key=key+k
+    for i in range(len(text)):
+        result+=chr((ord(text[i])-97 + ord(key[i]) - 97) % 26 + 97)
+    return result
+               
+
                          
                
-def vigenere(k,mode):
+def vigenere_files(k,mode):
     
 
             f = open("Input Files/Vigenere/Vigenere_plain.txt", "r")
@@ -260,22 +376,52 @@ def vigenere(k,mode):
 
 if __name__=="__main__":
 
-    caesar(3)
-    #p.write("\nkey=6\n")
-    caesar(6)
-    #p.write("\nkey=12\n")
-    caesar(12)
+    caesar_files(3)
+    caesar_files(6)
+    caesar_files(12)
 
-    hill(np.array([[5, 17], [8, 3]]))
-    hill( np.array([[2, 4, 12], [9, 1, 6], [7, 5, 3]]))
+    hill_files(np.array([[5, 17], [8, 3]]))
+    hill_files( np.array([[2, 4, 12], [9, 1, 6], [7, 5, 3]]))
     
-    playfair("rats")
-    playfair("archangel")
+    playfair_files("rats")
+    playfair_files("archangel")
 
-    vernam("SPARTANS")   
+    vernam_files("SPARTANS")   
 
-    vigenere("pie",False)
-    vigenere("aether",True)
+    vigenere_files("pie",False)
+    vigenere_files("aether",True)
+
+
+
+    while(1):
+        plain_text=input("Enter plain text\n")
+        caesar_key=int(input("Enter caesar key\n"))
+        print(caesar(plain_text,caesar_key))
+      
+        hill_keysize=int(input("Enter hill cipher key size\n")) # as it's a square matrix
+        hill_values=list(map(int, input("Enter matrix values per row in one line separated by space \n").split())) 
+        hill_matrix = np.array(hill_values).reshape(hill_keysize, hill_keysize) 
+        print(hill_matrix) 
+        print(hill(plain_text,hill_matrix))
+
+        playfair_key=(input("Enter playfair key\n"))
+        print(playfair(plain_text,playfair_key))
+        vernam_key=input("Enter vernam key\n")
+        print(vernam(plain_text,vernam_key))
+      
+        vigenere_mode=(input("Enter vigenere mode 1 for auto and 0 for repeating"))
+        vigenere_key=input("Enter vigenere key\n ")
+        print(vigenere(plain_text,vigenere_key,vigenere_mode))
+
+
+
+
+
+
+
+
+
+
                 
 
    

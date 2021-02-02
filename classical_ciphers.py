@@ -1,4 +1,7 @@
 import numpy as np
+
+
+
 def caesar(key):
 
             f = open("Input Files/Caesar/caesar_plain.txt", "r")
